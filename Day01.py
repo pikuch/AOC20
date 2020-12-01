@@ -1,4 +1,5 @@
 # AOC20 day 01
+from itertools import product
 
 
 def load_data(f_name):
@@ -7,35 +8,32 @@ def load_data(f_name):
     return data_read
 
 
-def to_numbers(data):
+def make_set_and_list(data):
     rows = data.split("\n")
-    return list(map(int, rows))
+    numbers = list(map(int, rows))
+    return set(numbers), numbers
 
 
-def get_multiplied(numbers):
-    seen = set()
-    for n in numbers:
-        if 2020-n in seen:
-            return n*(2020-n)
-        else:
-            seen.add(n)
+def find_two_parts_of_2020(number_set, number_list):
+    for n in number_list:
+        if 2020-n in number_set:
+            return n, 2020-n
     return None
 
 
-def get_multiplied3(numbers):
-    seen = set()
-    for n in numbers:
-        seen.add(n)
-    for x in numbers:
-        for y in numbers:
-            if 2020-x-y in seen:
-                return x*y*(2020-x-y)
+def find_three_parts_of_2020(number_set, number_list):
+    for m, n in product(number_list, number_list):
+        if 2020 - m - n in number_set:
+            return m, n, 2020 - m - n
+    return None
 
 
 def run():
     data = load_data("Day01.txt")
-    numbers = to_numbers(data)
-    multiplied = get_multiplied(numbers)
-    print(multiplied)
-    multiplied3 = get_multiplied3(numbers)
-    print(multiplied3)
+    number_set, number_list = make_set_and_list(data)
+    a, b = find_two_parts_of_2020(number_set, number_list)
+    print(f"The two numbers that add up to 2020 are {a} and {b} and their product is {a * b}")
+    # 542619
+    i, j, k = find_three_parts_of_2020(number_set, number_list)
+    print(f"The three numbers that add up to 2020 are {i}, {j} and {k} and their product is {i * j * k}")
+    # 32858450
