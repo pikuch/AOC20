@@ -22,9 +22,10 @@ def find_two_parts_of_2020(number_set, number_list):
 
 
 def find_three_parts_of_2020(number_set, number_list):
-    for m, n in product(number_list, number_list):
-        if 2020 - m - n in number_set:
-            return m, n, 2020 - m - n
+    for i in range(len(number_list)):
+        for j in range(i + 1, len(number_list)):
+            if 2020 - number_list[i] - number_list[j] in number_set:
+                return number_list[i], number_list[j], 2020 - number_list[i] - number_list[j]
     return None
 
 
