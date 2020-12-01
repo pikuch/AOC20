@@ -1,5 +1,5 @@
 # AOC20 day 01
-from itertools import product
+from itertools import combinations
 
 
 def load_data(f_name):
@@ -22,10 +22,9 @@ def find_two_parts_of_2020(number_set, number_list):
 
 
 def find_three_parts_of_2020(number_set, number_list):
-    for i in range(len(number_list)):
-        for j in range(i + 1, len(number_list)):
-            if 2020 - number_list[i] - number_list[j] in number_set:
-                return number_list[i], number_list[j], 2020 - number_list[i] - number_list[j]
+    for m, n in combinations(number_list, 2):
+        if 2020 - m - n in number_set:
+            return m, n, 2020 - m - n
     return None
 
 
