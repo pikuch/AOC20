@@ -24,5 +24,7 @@ class PasswordEntry:
 def run():
     data = load_data("Day02.txt")
     entries = [PasswordEntry(line) for line in data.split("\n")]
-    print(sum(entry.is_valid_old() for entry in entries))
-    print(sum(entry.is_valid_new() for entry in entries))
+    valid_passwords_old_rules = sum(entry.is_valid_old() for entry in entries)
+    print(f"According to the old rules there are {valid_passwords_old_rules} valid passwords")
+    valid_passwords_new_rules = sum(entry.is_valid_new() for entry in entries)
+    print(f"According to the new rules there are {valid_passwords_new_rules} valid passwords")
