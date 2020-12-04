@@ -94,5 +94,5 @@ def count_valid2(data):
 def run():
     data = load_data("Day04.txt")
     print(count_valid(data))  # 219
-    print(count_valid2(data))  # 219
+    print(count_valid2(data))  # 127
 
