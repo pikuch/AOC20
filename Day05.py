@@ -7,15 +7,13 @@ def load_data(f_name):
     return data_read
 
 
-def get_id(code):
-    row = int(code[:7], 2)
-    col = int(code[7:], 2)
-    return row * 8 + col
+def calculate_id(code):
+    return int(code, 2)
 
 
 def id_list(data):
     binary_list = data.translate(str.maketrans("FBLR", "0101")).split("\n")
-    return list(map(get_id, binary_list))
+    return list(map(calculate_id, binary_list))
 
 
 def get_missing(ids):
