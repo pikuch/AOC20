@@ -26,24 +26,19 @@ def get_rules(data):
     return rules
 
 
-def is_shiny_gold_inside(k, rules):
-    for element in rules[k]:
-        if element[1] == "shiny gold":
-            return True
-        if is_shiny_gold_inside(element[1], rules):
+def is_shiny_gold_inside(bag, rules):
+    for contents in rules[bag]:
+        if contents[1] == "shiny gold" or is_shiny_gold_inside(contents[1], rules):
             return True
     return False
 
 
 def count_insides(bag, rules):
-    s = 0
-    for element in rules[bag]:
-        s += element[0] + element[0] * count_insides(element[1], rules)
-    return s
+    return sum((element[0] * (1 + count_insides(element[1], rules)) for element in rules[bag]))
 
 
 def run():
     data = load_data("Day07.txt")
     rules = get_rules(data)
-    print(sum(map(lambda k: is_shiny_gold_inside(k, rules), rules.keys())))
+    print(sum(map(lambda bag: is_shiny_gold_inside(bag, rules), rules.keys())))
     print(count_insides("shiny gold", rules))
