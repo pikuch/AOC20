@@ -7,22 +7,20 @@ def load_data(f_name):
     return data_read
 
 
-def get_rules(data):
+def parse_rules(data):
     rules = dict()
+    data = data.replace("bags", "").replace("bag", "").replace(".", "")
     for line in data.split("\n"):
-        outer, inner = line.split("contain")
-        outer = outer.replace("bags", "").strip()
-        inner = inner.replace("bags", "")
-        inner = inner.replace("bag", "")
-        inner = inner.replace(".", "")
-        inner = inner.replace("no other", "").strip()
-        inner_list = list(map(str.strip, inner.split(",")))
-        contents = []
-        if inner_list[0] != "":
+        bag, contents = line.split("contain")
+        if contents.strip() == "no other":
+            rules[bag.strip()] = []
+        else:
+            inner_list = list(map(str.strip, contents.split(",")))
+            counts_list = []
             for elem in inner_list:
                 count, name1, name2 = elem.split()
-                contents.append([int(count), name1 + " " + name2])
-        rules[outer] = contents
+                counts_list.append([int(count), name1 + " " + name2])
+            rules[bag.strip()] = counts_list
     return rules
 
 
@@ -39,6 +37,6 @@ def count_insides(bag, rules):
 
 def run():
     data = load_data("Day07.txt")
-    rules = get_rules(data)
+    rules = parse_rules(data)
     print(sum(map(lambda bag: is_shiny_gold_inside(bag, rules), rules.keys())))
     print(count_insides("shiny gold", rules))
