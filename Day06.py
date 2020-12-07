@@ -8,42 +8,10 @@ def load_data(f_name):
     return data_read
 
 
-def get_answers(data):
-    answers = []
-    current = []
-    lines = data.split("\n")
-    for line in lines:
-        if line == "":
-            answers.append(current)
-            current = []
-        else:
-            current.append(line)
-    answers.append(current)
-    return answers
-
-
 def run():
     data = load_data("Day06.txt")
-    answers = get_answers(data)
-
-    different_counter = 0
-    for group in answers:
-        different = set()
-        for person in group:
-            for c in person:
-                different.add(c)
-        different_counter += len(different)
-
-    print(different_counter)
-
-    same_counter = 0
-    for group in answers:
-        counts = defaultdict(lambda: 0)
-        for person in group:
-            for c in person:
-                counts[c] += 1
-        for ans in counts.values():
-            if ans == len(group):
-                same_counter += 1
-
-    print(same_counter)
+    groups = data.split("\n\n")
+    different_answers = sum(len(set.union(*map(set, group.split("\n")))) for group in groups)
+    same_answers = sum(len(set.intersection(*map(set, group.split("\n")))) for group in groups)
+    print(different_answers)
+    print(same_answers)
