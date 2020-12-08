@@ -1,5 +1,5 @@
 # AOC20 day 08
-from Handheld import Handheld
+from PrototypeHandheld import Handheld
 
 
 def load_data(f_name):
