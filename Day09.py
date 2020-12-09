@@ -22,7 +22,7 @@ def find_invalid(signal, preamble):
     return None
 
 
-def find_series_limits(signal, key):
+def find_series_limit_sum(signal, key):
     for start_index in range(len(signal)):
         the_sum = 0
         length = 0
@@ -30,7 +30,8 @@ def find_series_limits(signal, key):
             the_sum += signal[start_index+length]
             length += 1
         if the_sum == key:
-            return sorted(signal[start_index:start_index+length])
+            series = signal[start_index:start_index+length]
+            return min(series) + max(series)
     return None
 
 
@@ -39,5 +40,5 @@ def run():
     signal = list(map(int, data.split("\n")))
     key = find_invalid(signal, 25)
     print(f"The invalid value is {key}")
-    series = find_series_limits(signal, key)
-    print(f"The sum of the smallest and largest value is {min(series) + max(series)}")
+    limit_sum = find_series_limit_sum(signal, key)
+    print(f"The sum of the smallest and largest value is {limit_sum}")
