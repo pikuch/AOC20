@@ -17,22 +17,22 @@ def is_invalid(value, preceding):
 
 def find_invalid(signal, preamble):
     for index in range(preamble, len(signal)):
-        if is_invalid(signal[index], signal[index-preamble : index]):
+        if is_invalid(signal[index], signal[index-preamble:index]):
             return signal[index]
     return None
 
 
 def find_series_limits(signal, key):
-    for start in range(len(signal)):
-        s = 0
-        s_list = []
+    for start_index in range(len(signal)):
+        the_sum = 0
+        sum_list = []
         length = 0
-        while s < key:
-            s += signal[start+length]
-            s_list.append(signal[start+length])
+        while the_sum < key:
+            the_sum += signal[start_index+length]
+            sum_list.append(signal[start_index+length])
             length += 1
-        if s == key:
-            return sorted(s_list)
+        if the_sum == key:
+            return sorted(sum_list)
     return None
 
 
@@ -40,6 +40,6 @@ def run():
     data = load_data("Day09.txt")
     signal = list(map(int, data.split("\n")))
     key = find_invalid(signal, 25)
-    print(key)
+    print(f"The invalid value is {key}")
     series = find_series_limits(signal, key)
-    print(min(series) + max(series))
+    print(f"The sum of the smallest and largest value is {min(series) + max(series)}")
