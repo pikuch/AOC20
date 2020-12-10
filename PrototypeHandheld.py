@@ -13,6 +13,8 @@ class Handheld:
             "jmp": self.jmp
         }
 
+    # instructions
+
     def nop(self, _):
         self.ip += 1
 
@@ -23,6 +25,7 @@ class Handheld:
     def jmp(self, val):
         self.ip += val
 
+    # runs the program until it detects an infinite loop or a jump outside of the program
     def run(self):
         while True:
             if self.ip not in self.visited:
