@@ -13,7 +13,6 @@ def run():
     handheld = Handheld(data)
     print(f"Untouched program result: {handheld.run()}")
 
-    outcome = ""
     for line in range(len(data)):
         if data[line].startswith("nop"):
             data[line] = data[line].replace("nop", "jmp")
