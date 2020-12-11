@@ -54,9 +54,49 @@ def transform(seats):
     return seats
 
 
+def count_neighbours2(row, col, seats):
+    n = 0
+    for dr, dc in ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)):
+        steps = 1
+        while True:
+            if (row+dr*steps) < 0 or (row+dr*steps) >= seats.shape[0] or (col+dc*steps) < 0 or (col+dc*steps) >= seats.shape[1]:
+                break
+            if seats[row+dr*steps][col+dc*steps] == 1:
+                n += 1
+                break
+            if seats[row + dr*steps][col + dc*steps] == 0:
+                break
+            steps += 1
+    return n
+
+
+def transform2(seats):
+    changes = 1
+    while changes > 0:
+        changes = 0
+        new_seats = np.empty_like(seats)
+        for row in range(seats.shape[0]):
+            for col in range(seats.shape[1]):
+                neighbours = count_neighbours2(row, col, seats)
+                if seats[row][col] == 0 and neighbours == 0:
+                    new_seats[row][col] = 1
+                    changes += 1
+                elif seats[row][col] == 1 and neighbours >= 5:
+                    new_seats[row][col] = 0
+                    changes += 1
+                else:
+                    new_seats[row][col] = seats[row][col]
+        seats = new_seats
+        print(changes)
+    return seats
+
+
 def run():
     data = load_data("Day11.txt")
     seats = parse_data(data)
     seats = transform(seats)
-    print(seats)
-    print(np.sum(seats[seats==1]))
+    print(np.sum(seats[seats == 1]))
+
+    seats = parse_data(data)
+    seats = transform2(seats)
+    print(np.sum(seats[seats == 1]))
