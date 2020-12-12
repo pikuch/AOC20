@@ -1,6 +1,4 @@
 # AOC20 day 12
-from math import cos, pi, sin, sqrt, atan2
-
 
 def load_data(f_name):
     with open(f_name, "r") as f:
@@ -34,6 +32,8 @@ def distance_after_naive_rules(instructions):
 def distance_after_actual_rules(instructions):
     x, y = 0, 0
     wx, wy = 10, 1
+    cos_values = {0: 1, 90: 0, 180: -1, 270: 0}
+    sin_values = {0: 0, 90: 1, 180: 0, 270: -1}
     for code, arg in instructions:
         if code == "N":
             wy += arg
@@ -44,21 +44,17 @@ def distance_after_actual_rules(instructions):
         elif code == "W":
             wx -= arg
         elif code == "L" or code == "R":
-            da = pi * arg / 180
             if code == "R":
-                da *= -1
-            r = sqrt(wx ** 2 + wy ** 2)
-            a = atan2(wy, wx) + da
-            wx = r * cos(a)
-            wy = r * sin(a)
+                arg = (360 - arg) % 360
+            wx, wy = cos_values[arg] * wx - sin_values[arg] * wy, sin_values[arg] * wx + cos_values[arg] * wy
         elif code == "F":
             x += arg * wx
             y += arg * wy
-    return int(abs(x) + abs(y))
+    return abs(x) + abs(y)
 
 
 def run():
     data = load_data("Day12.txt")
     instructions = [(line[0], int(line[1:])) for line in data.split("\n")]
-    print(distance_after_naive_rules(instructions))  # 2297
-    print(distance_after_actual_rules(instructions))  # 89984
+    print(distance_after_naive_rules(instructions))
+    print(distance_after_actual_rules(instructions))
