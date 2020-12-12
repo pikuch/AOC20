@@ -1,5 +1,5 @@
 # AOC20 day 12
-from math import cos, pi, sin
+from math import cos, pi, sin, sqrt, atan2
 
 
 def load_data(f_name):
@@ -9,7 +9,7 @@ def load_data(f_name):
 
 
 def run():
-    data = load_data("Day12test0.txt")
+    data = load_data("Day12.txt")
     x, y, a = 0, 0, 0
     inst = []
     for line in data.split("\n"):
@@ -46,14 +46,14 @@ def run():
             wx += ii[1]
         elif ii[0] == "W":
             wx -= ii[1]
-        elif ii[0] == "L":
-            wx1 = wx*cos(ii[1]*pi/180) - wy*sin(ii[1]*pi/180)
-            wy1 = wx*sin(ii[1]*pi/180) + wy*cos(ii[1]*pi/180)
-            wx, wy = wx1, wy1
-        elif ii[0] == "R":
-            wx1 = -wx*cos(ii[1]*pi/180) + wy*sin(ii[1]*pi/180)
-            wy1 = -wx*sin(ii[1]*pi/180) - wy*cos(ii[1]*pi/180)
-            wx, wy = wx1, wy1
+        elif ii[0] == "L" or ii[0] == "R":
+            da = pi * ii[1] / 180
+            radius = sqrt(wx**2 + wy**2)
+            if ii[0] == "R":
+                da *= -1
+            a = atan2(wy, wx) + da
+            wx = radius * cos(a)
+            wy = radius * sin(a)
         elif ii[0] == "F":
             x += ii[1] * wx
             y += ii[1] * wy
