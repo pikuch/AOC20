@@ -8,54 +8,55 @@ def load_data(f_name):
     return data_read
 
 
+def distance_after_naive_rules(instructions):
+    x, y, a = 0, 0, 0
+    for code, arg in instructions:
+        if code == "N":
+            y += arg
+        elif code == "S":
+            y -= arg
+        elif code == "E":
+            x += arg
+        elif code == "W":
+            x -= arg
+        elif code == "L":
+            a += arg
+        elif code == "R":
+            a -= arg
+        elif code == "F":
+            x += arg * cos(a*pi/180)
+            y += arg * sin(a*pi/180)
+    return int(abs(x) + abs(y))
+
+
+def distance_after_actual_rules(instructions):
+    x, y = 0, 0
+    wx, wy = 10, 1
+    for code, arg in instructions:
+        if code == "N":
+            wy += arg
+        elif code == "S":
+            wy -= arg
+        elif code == "E":
+            wx += arg
+        elif code == "W":
+            wx -= arg
+        elif code == "L" or code == "R":
+            da = pi * arg / 180
+            if code == "R":
+                da *= -1
+            r = sqrt(wx ** 2 + wy ** 2)
+            a = atan2(wy, wx) + da
+            wx = r * cos(a)
+            wy = r * sin(a)
+        elif code == "F":
+            x += arg * wx
+            y += arg * wy
+    return int(abs(x) + abs(y))
+
+
 def run():
     data = load_data("Day12.txt")
-    x, y, a = 0, 0, 0
-    inst = []
-    for line in data.split("\n"):
-        inst.append((line[0], int(line[1:])))
-
-    for ii in inst:
-        if ii[0] == "N":
-            y += ii[1]
-        elif ii[0] == "S":
-            y -= ii[1]
-        elif ii[0] == "E":
-            x += ii[1]
-        elif ii[0] == "W":
-            x -= ii[1]
-        elif ii[0] == "L":
-            a += ii[1]
-        elif ii[0] == "R":
-            a -= ii[1]
-        elif ii[0] == "F":
-            x += ii[1] * cos(a*pi/180)
-            y += ii[1] * sin(a*pi/180)
-
-    print(x, y, a, abs(x)+abs(y))
-
-    wx, wy = 10, 1
-    x, y, a = 0, 0, 0
-
-    for ii in inst:
-        if ii[0] == "N":
-            wy += ii[1]
-        elif ii[0] == "S":
-            wy -= ii[1]
-        elif ii[0] == "E":
-            wx += ii[1]
-        elif ii[0] == "W":
-            wx -= ii[1]
-        elif ii[0] == "L" or ii[0] == "R":
-            da = pi * ii[1] / 180
-            radius = sqrt(wx**2 + wy**2)
-            if ii[0] == "R":
-                da *= -1
-            a = atan2(wy, wx) + da
-            wx = radius * cos(a)
-            wy = radius * sin(a)
-        elif ii[0] == "F":
-            x += ii[1] * wx
-            y += ii[1] * wy
-
-    print(x, y, a, abs(x)+abs(y))
+    instructions = [(line[0], int(line[1:])) for line in data.split("\n")]
+    print(distance_after_naive_rules(instructions))  # 2297
+    print(distance_after_actual_rules(instructions))  # 89984
