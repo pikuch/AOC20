@@ -10,6 +10,8 @@ def load_data(f_name):
 
 def distance_after_naive_rules(instructions):
     x, y, a = 0, 0, 0
+    cos_values = {0: 1, 90: 0, 180: -1, 270: 0}
+    sin_values = {0: 0, 90: 1, 180: 0, 270: -1}
     for code, arg in instructions:
         if code == "N":
             y += arg
@@ -20,13 +22,13 @@ def distance_after_naive_rules(instructions):
         elif code == "W":
             x -= arg
         elif code == "L":
-            a += arg
+            a = (a + arg + 360) % 360
         elif code == "R":
-            a -= arg
+            a = (a - arg + 360) % 360
         elif code == "F":
-            x += arg * cos(a*pi/180)
-            y += arg * sin(a*pi/180)
-    return int(abs(x) + abs(y))
+            x += arg * cos_values[a]
+            y += arg * sin_values[a]
+    return abs(x) + abs(y)
 
 
 def distance_after_actual_rules(instructions):
