@@ -1,6 +1,4 @@
 # AOC20 day 13
-from math import gcd
-
 
 def load_data(f_name):
     with open(f_name, "r") as f:
@@ -11,10 +9,7 @@ def load_data(f_name):
 def parse_data(data):
     lines = data.split("\n")
     arrival = int(lines[0])
-    busses = []
-    for element in lines[1].split(","):
-        if element != "x":
-            busses.append(int(element))
+    busses = [int(element) for element in lines[1].split(",") if element != "x"]
     return arrival, busses
 
 
@@ -25,16 +20,10 @@ def calculate_answer_1(arrival, busses):
 
 def parse_times(data):
     lines = data.split("\n")
-    times = []
-    shift = 0
-    for element in lines[1].split(","):
-        if element != "x":
-            times.append((int(element), shift))
-        shift += 1
-    return times
+    return [(int(element), i) for i, element in enumerate(lines[1].split(",")) if element != "x"]
 
 
-def calculate_timestamp(times):  # See Chinese Remainder Theorem
+def calculate_timestamp(times):  # See: Chinese Remainder Theorem
     t = times[0][1]
     period = times[0][0]
     for i in range(1, len(times)):
@@ -46,8 +35,9 @@ def calculate_timestamp(times):  # See Chinese Remainder Theorem
 
 def run():
     data = load_data("Day13.txt")
+    # part 1
     arrival, busses = parse_data(data)
     print(calculate_answer_1(arrival, busses))
-
+    # part 2
     times = parse_times(data)
     print(calculate_timestamp(times))
