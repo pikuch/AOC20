@@ -68,7 +68,7 @@ def generate_addresses(address, mask):
                 to_check.append((value + (2 ** bit), bit + 1))
 
 
-def run():
+def run():  # would be faster to use two 64 bit masks, but python is not the best for that
     data = load_data("Day14.txt")
     program = read_instructions(data.split("\n"))
     memory = execute(program, 1)
