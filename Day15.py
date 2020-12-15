@@ -23,7 +23,7 @@ def generate(n, numbers):
 
 
 def run():
-    data = load_data("Day15test0.txt")
+    data = load_data("Day15.txt")
     numbers = list(map(int, data.split(",")))
     generate(2020, numbers)
     print(numbers[-1])
