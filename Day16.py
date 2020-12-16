@@ -56,6 +56,6 @@ def get_invalid_values(tickets, field_ranges):
 
 
 def run():
-    data = load_data("Day16test0.txt")
+    data = load_data("Day16.txt")
     field_ranges, my_ticket, other_tickets = parse_data(data)
     print(sum(get_invalid_values(other_tickets, field_ranges)))
