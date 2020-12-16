@@ -1,4 +1,5 @@
 # AOC20 day 16
+from functools import reduce
 
 
 def load_data(f_name):
@@ -41,111 +42,41 @@ def is_valid_ticket(ticket, fields):
     return all(map(lambda number: is_valid_number(number, fields), ticket.numbers))
 
 
-##### old, ugly code below
-
-def parse_data(data):
-    blocks = data.split("\n\n")
-    field_lines = blocks[0].splitlines()
-    my_ticket_lines = blocks[1].splitlines()
-    other_tickets_lines = blocks[2].splitlines()
-
-    field_ranges = dict()
-    for line in field_lines:
-        field_name, ranges = line.split(": ")
-        range_strings = ranges.split(" or ")
-        range_list = []
-        for r in range_strings:
-            range_list.append(list(map(int, r.split("-"))))
-        field_ranges[field_name] = range_list
-
-    my_ticket = list(map(int, my_ticket_lines[1].split(",")))
-
-    other_tickets = []
-    for line in other_tickets_lines[1:]:
-        other_tickets.append(list(map(int, line.split(","))))
-
-    return field_ranges, my_ticket, other_tickets
+def is_number_valid_for_field(number, field_name, fields):
+    return any(map(lambda field: field.name == field_name and field.encompasses(number), fields))
 
 
-def is_within_field_ranges(value, field):
-    within = False
-    for field_range in field:
-        if field_range[0] <= value <= field_range[1]:
-            within = True
-            break
-    return within
+def determine_field_names(valid_tickets, fields):
+    options = [set([fields[i].name for i in range(len(fields))]) for j in range(len(fields))]
 
+    for field in range(len(options)):
+        for field_name in [fields[i].name for i in range(len(fields))]:
+            if not all(map(lambda ticket: is_number_valid_for_field(ticket.numbers[field], field_name, fields), valid_tickets)):
+                options[field].discard(field_name)
 
-def get_invalid_values(tickets, field_ranges):
-    invalid_value_list = []
-    valid_tickets = []
-    for ticket in tickets:
-        is_ticket_valid = True
-        for value in ticket:
-            is_valid = False
-            for field in field_ranges.values():
-                if is_within_field_ranges(value, field):
-                    is_valid = True
-                    break
-            if not is_valid:
-                invalid_value_list.append(value)
-                is_ticket_valid = False
-        if is_ticket_valid:
-            valid_tickets.append(ticket)
+    field_names = [None] * len(fields)
+    found_new = True
+    while found_new:
+        found_new = False
+        for i in range(len(options)):
+            if len(options[i]) == 1:
+                found_new = True
+                field_names[i] = list(options[i])[0]
+                for j in range(len(options)):
+                    options[j].discard(field_names[i])
+                continue
 
-    return invalid_value_list, valid_tickets
-
-
-def does_not_fit(val, field):
-    fits = False
-    for field_range in field:
-        if field_range[0] <= val <= field_range[1]:
-            fits = True
-            break
-    return not fits
-
-
-def determine_fields(tickets, field_ranges):
-    field_options = [set(field_ranges.keys()) for i in tickets[0]]
-    determined = [""] * len(tickets[0])
-    undetermined_counter = len(tickets[0])
-
-    for i in range(len(determined)):
-        for k in field_ranges.keys():
-            can_be = True
-            for j in range(len(tickets)):
-                # field i, ticket j, field_range k
-                if does_not_fit(tickets[j][i], field_ranges[k]):
-                    can_be = False
-                    break
-            if not can_be:
-                field_options[i].discard(k)
-
-    while undetermined_counter > 0:
-        for i in range(len(determined)):
-            if len(field_options[i]) == 1:
-                determined[i] = list(field_options[i])[0]
-                undetermined_counter -= 1
-                for j in range(len(determined)):
-                    field_options[j].discard(determined[i])
-                break
-    return determined
+    return field_names
 
 
 def run():
     data = load_data("Day16.txt")
-    field_ranges, my_ticket, other_tickets = parse_data(data)
-    invalid_values, valid_tickets = get_invalid_values(other_tickets, field_ranges)
-    print(sum(invalid_values))
-
-    field_names = determine_fields(valid_tickets, field_ranges)
-    det = 1
-    for i in range(len(field_names)):
-        if field_names[i].startswith("departure"):
-            det *= my_ticket[i]
-    print(det)
 
     fields, my_ticket, other_tickets = data_to_objects(data)
     invalid_number_sum = sum(map(lambda t: sum(get_invalid_numbers(t, fields)), other_tickets))
     valid_tickets = list(filter(lambda t: is_valid_ticket(t, fields), other_tickets))
     print(invalid_number_sum)
+
+    field_names = determine_field_names(valid_tickets, fields)
+    departure_pairs = filter(lambda pos: field_names[pos[0]].startswith("departure"), enumerate(my_ticket.numbers))
+    print(reduce(lambda x, pos: x * pos[1], departure_pairs, 1))
