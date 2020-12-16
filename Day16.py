@@ -29,8 +29,16 @@ def data_to_objects(data):
     return fields, my_ticket, other_tickets
 
 
+def is_valid_number(number, fields):
+    return any(map(lambda field: field.encompasses(number), fields))
+
+
+def get_invalid_numbers(ticket, fields):
+    return filter(lambda n: not is_valid_number(n, fields), ticket.numbers)
+
+
 def is_valid_ticket(ticket, fields):
-    return all(map(lambda number: any(map(lambda field: field.encompasses(number), fields)), ticket.numbers))
+    return all(map(lambda number: is_valid_number(number, fields), ticket.numbers))
 
 
 ##### old, ugly code below
@@ -138,5 +146,6 @@ def run():
     print(det)
 
     fields, my_ticket, other_tickets = data_to_objects(data)
+    invalid_number_sum = sum(map(lambda t: sum(get_invalid_numbers(t, fields)), other_tickets))
     valid_tickets = list(filter(lambda t: is_valid_ticket(t, fields), other_tickets))
-    
+    print(invalid_number_sum)
