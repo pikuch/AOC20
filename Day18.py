@@ -18,11 +18,11 @@ def operation(x, op, y):
         exit(1)
 
 
-def eval_stack_top(stack_top, new_item):
-    if len(stack_top):
-        stack_top.append(operation(new_item, stack_top.pop(), stack_top.pop()))
+def eval_stack_top(stack, new_item):
+    if len(stack):
+        stack.append(operation(new_item, stack.pop(), stack.pop()))
     else:
-        stack_top.append(new_item)
+        stack.append(new_item)
 
 
 def evaluate(expr):
@@ -43,14 +43,19 @@ def evaluate(expr):
     return stack[-1].pop()
 
 
-def eval_stack_top_plus(stack_top, new_item):
-    if len(stack_top):
-        if stack_top[-1] == "+":
-            stack_top.append(operation(new_item, stack_top.pop(), stack_top.pop()))
+def eval_stack_top_plus(stack, new_item):
+    if len(stack):
+        if stack[-1] == "+":
+            stack.append(operation(new_item, stack.pop(), stack.pop()))
         else:
-            stack_top.append(new_item)
+            stack.append(new_item)
     else:
-        stack_top.append(new_item)
+        stack.append(new_item)
+
+
+def eval_leftovers(stack):
+    while len(stack) > 1:
+        stack.append(operation(stack.pop(), stack.pop(), stack.pop()))
 
 
 def evaluate_plus(expr):
@@ -65,13 +70,11 @@ def evaluate_plus(expr):
         elif item == "(":
             stack.append(deque())
         elif item == ")":
-            while len(stack[-1]) > 1:
-                stack[-1].append(operation(stack[-1].pop(), stack[-1].pop(), stack[-1].pop()))
+            eval_leftovers(stack[-1])
             ret = stack[-1].pop()
             stack.pop()
             eval_stack_top_plus(stack[-1], ret)
-    while len(stack[-1]) > 1:
-        stack[-1].append(operation(stack[-1].pop(), stack[-1].pop(), stack[-1].pop()))
+    eval_leftovers(stack[-1])
     return stack[-1].pop()
 
 
