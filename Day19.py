@@ -7,27 +7,20 @@ def load_data(f_name):
     return data_read
 
 
-def parse_data(data):
-    rule_data, string_data = data.split("\n\n")
-    rules = dict()
-    for line in rule_data.splitlines():
-        rule_number_string, the_rest = line.split(": ")
-        current_rules = the_rest.split(" | ")
-        if current_rules[0].startswith("\""):
-            rules[int(rule_number_string)] = current_rules[0][1]
+class Rule:
+    def __init__(self, s):
+        if s.startswith("\""):
+            self.type = "final"
+            self.value = s[1]
         else:
-            rule = []
-            for r in current_rules:
-                rule.append(list(map(int, r.split())))
-            rules[int(rule_number_string)] = rule
-
-    return rules, string_data.splitlines()
+            self.type = "options"
+            self.value = list(map(lambda option: list(map(int, option.split())), s.split(" | ")))
 
 
 def get_splits(s, n):
-    if n==1:
+    if n == 1:
         return s
-    elif n==2:
+    elif n == 2:
         for num in range(1, len(s)):
             yield s[:num], s[num:]
     else:
@@ -35,24 +28,31 @@ def get_splits(s, n):
         exit(1)
 
 
-def option_match(s, option, rules):
-    return any(map(lambda sss: all(map(lambda sto: msg_match(sto[0], sto[1], rules), zip(sss, option))), get_splits(s, len(option))))
+class Ruleset:
+    def __init__(self, s):
+        self.rules = dict()
+        for line in s.splitlines():
+            rule_number_string, rule_description = line.split(": ")
+            self.rules[int(rule_number_string)] = Rule(rule_description)
+
+    def match(self, s, rule):
+        if self.rules[rule].type == "final":
+            return s == self.rules[rule].value
+        else:
+            return any(map(lambda subrules: self.match_subrules(s, subrules), self.rules[rule].value))
+
+    def match_subrules(self, s, subrules):
+        return any(map(lambda substrings: all(map(lambda sr: self.match(sr[0], sr[1]),
+                                                  zip(substrings, subrules))),
+                       get_splits(s, len(subrules))))
 
 
-def msg_match(s, rule, rules):
-    if isinstance(rules[rule], str):
-        return s == rules[rule]
-    else:
-        matched = False
-        for option in rules[rule]:
-            if option_match(s, option, rules):
-                matched = True
-                break
-        return matched
+def parse_data(data):
+    rule_data, string_data = data.split("\n\n")
+    return Ruleset(rule_data), string_data.splitlines()
 
 
 def run():
-    data = load_data("Day19.txt")
+    data = load_data("Day19test0.txt")
     rules, strings = parse_data(data)
-
-    print(sum(map(lambda s: msg_match(s, 0, rules), strings)))
+    print(sum(map(lambda s: rules.match(s, 0), strings)))
