@@ -1,4 +1,5 @@
 # AOC20 day 19
+from itertools import combinations
 
 
 def load_data(f_name):
@@ -23,8 +24,11 @@ def get_splits(s, n):
     elif n == 2:
         for num in range(1, len(s)):
             yield s[:num], s[num:]
+    elif n == 3:
+        for i, j in combinations(range(1, len(s)), 2):
+            yield s[:i], s[i:j], s[j:]
     else:
-        print("Oops!")  # good for now
+        print("Oops!")  # not gonna happen
         exit(1)
 
 
@@ -53,6 +57,6 @@ def parse_data(data):
 
 
 def run():
-    data = load_data("Day19test0.txt")
+    data = load_data("Day19test1.txt")
     rules, strings = parse_data(data)
     print(sum(map(lambda s: rules.match(s, 0), strings)))
