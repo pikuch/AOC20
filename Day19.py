@@ -1,5 +1,6 @@
 # AOC20 day 19
 from itertools import combinations
+from functools import lru_cache
 
 
 def load_data(f_name):
@@ -17,7 +18,7 @@ def parse_rule(s):
 
 def get_splits(s, n):
     if n == 1:
-        return s
+        yield [s]
     elif n == 2:
         for num in range(1, len(s)):
             yield s[:num], s[num:]
@@ -36,16 +37,27 @@ class Ruleset:
             rule_number_string, rule_description = line.split(": ")
             self.rules[int(rule_number_string)] = parse_rule(rule_description)
 
+    @lru_cache()
     def match(self, s, rule):
         if isinstance(self.rules[rule], str):
             return s == self.rules[rule]
         else:
-            return any(map(lambda subrules: self.match_subrules(s, subrules), self.rules[rule]))
+            for subrules in self.rules[rule]:
+                if self.match_subrules(s, tuple(subrules)):
+                    return True
+            return False
 
+    @lru_cache()
     def match_subrules(self, s, subrules):
-        return any(map(lambda substrings: all(map(lambda sr: self.match(sr[0], sr[1]),
-                                                  zip(substrings, subrules))),
-                       get_splits(s, len(subrules))))
+        for subs in get_splits(s, len(subrules)):
+            all_match = True
+            for i in range(len(subrules)):
+                if not self.match(subs[i], subrules[i]):
+                    all_match = False
+                    break
+            if all_match:
+                return True
+        return False
 
 
 def parse_data(data):
@@ -56,6 +68,7 @@ def parse_data(data):
 def run():
     data = load_data("Day19.txt")
     rules, strings = parse_data(data)
-    rules.match(strings[0], 0)
-    exit(1)
+    for s in strings[:1]:
+        print(rules.match(strings[0], 0))
+#    exit(0)
     print(sum([rules.match(s, 0) for s in strings]))
