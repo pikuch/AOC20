@@ -67,6 +67,9 @@ def parse_data(data):
 
 def run():
     data = load_data("Day19.txt")
+
+    # TODO: parse into a state machine and step from state to state in O(n)
+
     rules, strings = parse_data(data)
     for s in strings[:1]:
         print(rules.match(strings[0], 0))
