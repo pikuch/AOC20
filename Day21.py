@@ -52,3 +52,4 @@ def run():
     foods = parse_foods(data)
     dangerous_ingredients = find_dangerous_ingredients(foods)
     print(count_safe_ingredients(foods, dangerous_ingredients))
+    print(",".join([pair[1] for pair in sorted(dangerous_ingredients.items(), key=lambda i: i[0])]))
