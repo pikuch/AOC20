@@ -40,27 +40,66 @@ class Puzzle:
         min_row = min([row for row, col in self.grid.keys()])
         min_col = min([col for row, col in self.grid.keys()])
         for r, c in product(range(self.assembly_size), range(self.assembly_size)):
-            self.assembly[r, c] = self.grid[(r//8 + min_row, c//8 + min_col)].pixels[1 + (r % 8), 1 + (c % 8)]
+            self.assembly[r, c] = self.grid[(r // 8 + min_row, c // 8 + min_col)].pixels[1 + (r % 8), 1 + (c % 8)]
 
-        return self.grid[(min_row, min_col)].number *\
-               self.grid[(min_row+11, min_col)].number *\
-               self.grid[(min_row, min_col+11)].number *\
-               self.grid[(min_row+11, min_col+11)].number
+        return self.grid[(min_row, min_col)].number * \
+               self.grid[(min_row + 11, min_col)].number * \
+               self.grid[(min_row, min_col + 11)].number * \
+               self.grid[(min_row + 11, min_col + 11)].number
 
     def try_place(self, tile, row, col):
-        if (row-1, col) in self.grid:
-            if np.any(tile.top_edge() != self.grid[(row-1, col)].bottom_edge()):
+        if (row - 1, col) in self.grid:
+            if np.any(tile.top_edge() != self.grid[(row - 1, col)].bottom_edge()):
                 return False
-        if (row+1, col) in self.grid:
-            if np.any(tile.bottom_edge() != self.grid[(row+1, col)].top_edge()):
+        if (row + 1, col) in self.grid:
+            if np.any(tile.bottom_edge() != self.grid[(row + 1, col)].top_edge()):
                 return False
-        if (row, col-1) in self.grid:
-            if np.any(tile.left_edge() != self.grid[(row, col-1)].right_edge()):
+        if (row, col - 1) in self.grid:
+            if np.any(tile.left_edge() != self.grid[(row, col - 1)].right_edge()):
                 return False
-        if (row, col+1) in self.grid:
-            if np.any(tile.right_edge() != self.grid[(row, col+1)].left_edge()):
+        if (row, col + 1) in self.grid:
+            if np.any(tile.right_edge() != self.grid[(row, col + 1)].left_edge()):
                 return False
         return True
+
+    def check_for_sea_monsters(self):
+        if self.mark_monsters():
+            return np.sum(self.assembly == 1)
+        self.assembly = np.rot90(self.assembly)
+        if self.mark_monsters():
+            return np.sum(self.assembly == 1)
+        self.assembly = np.rot90(self.assembly)
+        if self.mark_monsters():
+            return np.sum(self.assembly == 1)
+        self.assembly = np.rot90(self.assembly)
+        if self.mark_monsters():
+            return np.sum(self.assembly == 1)
+        self.assembly = np.rot90(self.assembly)
+        self.assembly = np.flipud(self.assembly)
+        if self.mark_monsters():
+            return np.sum(self.assembly == 1)
+        self.assembly = np.rot90(self.assembly)
+        if self.mark_monsters():
+            return np.sum(self.assembly == 1)
+        self.assembly = np.rot90(self.assembly)
+        if self.mark_monsters():
+            return np.sum(self.assembly == 1)
+        self.assembly = np.rot90(self.assembly)
+        if self.mark_monsters():
+            return np.sum(self.assembly == 1)
+        return None
+
+    def mark_monsters(self):
+        monster = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                            [1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1],
+                            [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0]])
+        count = 0
+        for row in range(0, self.assembly_size - monster.shape[0] + 1):
+            for col in range(0, self.assembly_size - monster.shape[1] + 1):
+                if np.all(monster <= self.assembly[row:row + monster.shape[0], col: col + monster.shape[1]]):
+                    count += 1
+                    self.assembly[row:row + monster.shape[0], col: col + monster.shape[1]] += monster
+        return count
 
 
 class Tile:
@@ -104,3 +143,5 @@ def run():
     data = load_data("Day20.txt")
     puzzle = Puzzle(data)
     print(puzzle.assemble())
+    print(puzzle.check_for_sea_monsters())
+    # Image.fromarray(puzzle.assembly*120).show()
