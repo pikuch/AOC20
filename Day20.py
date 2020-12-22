@@ -1,6 +1,7 @@
 # AOC20 day 20
 import numpy as np
 from itertools import product
+from PIL import Image, ImageDraw
 
 
 def load_data(f_name):
@@ -87,14 +88,24 @@ class Tile:
 def run():
     data = load_data("Day20.txt")
     puzzle = Puzzle(data)
-    puzzle.assemble()
-    for row in range(-13, 13):
-        print()
-        for col in range(-13, 13):
-            if (row, col) in puzzle.grid:
-                print("[X]", end="")
-            elif (row, col) in puzzle.spaces:
-                print("[?]", end="")
-            else:
-                print("[ ]", end="")
 
+    puzzle.assemble()
+
+    row_set = set()
+    col_set = set()
+    for row, col in puzzle.grid.keys():
+        row_set.add(row)
+        col_set.add(col)
+
+    img = Image.new("RGB", (1400, 1400))
+    ctx = ImageDraw.Draw(img)
+
+    for row, col in puzzle.grid.keys():
+        r = row - min(row_set)
+        c = col - min(col_set)
+        for y, x in product(range(10), range(10)):
+            if puzzle.grid[(row, col)].pixels[y][x] == 1:
+                ctx.rectangle((c * 103 + x*10, r * 103 + y*10, c * 103 + x*10+9, r * 103 + y*10+9),
+                              (240, 240, 200))
+
+    img.show()
