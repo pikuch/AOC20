@@ -32,6 +32,6 @@ def play_cards(cards1, cards2):
 
 
 def run():
-    data = load_data("Day22test0.txt")
+    data = load_data("Day22.txt")
     cards1, cards2 = get_cards(data)
     print(play_cards(cards1, cards2))
