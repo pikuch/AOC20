@@ -13,7 +13,11 @@ def get_cards(data):
     return deque(map(int, player1.splitlines()[1:])), deque(map(int, player2.splitlines()[1:]))
 
 
-def play_cards(cards1, cards2):
+def score(cards1, cards2):
+    return sum((i + 1) * v for i, v in enumerate(reversed(cards1))), sum((i + 1) * v for i, v in enumerate(reversed(cards2)))
+
+
+def play_combat(cards1, cards2):
     while len(cards1) and len(cards2):
         c1 = cards1.popleft()
         c2 = cards2.popleft()
@@ -23,15 +27,40 @@ def play_cards(cards1, cards2):
         else:
             cards2.append(c2)
             cards2.append(c1)
+    return score(cards1, cards2)
 
-    points = 0
-    winner_cards = cards1 + cards2
-    for i, value in enumerate(reversed(winner_cards)):
-        points += (i+1) * value
-    return points
+
+def play_recursive_combat(cards1, cards2):
+    seen = set()
+    while len(cards1) and len(cards2):
+        # infinite loop prevention
+        state = tuple(list(cards1) + [0] + list(cards2))
+        if state in seen:
+            return 1, 0
+        else:
+            seen.add(state)
+
+        c1 = cards1.popleft()
+        c2 = cards2.popleft()
+        if len(cards1) >= c1 and len(cards2) >= c2:
+            result = play_recursive_combat(deque(tuple(cards1)[:c1]), deque(tuple(cards2)[:c2]))
+            wins1 = result[0] > result[1]
+        else:
+            wins1 = c1 > c2
+
+        if wins1:
+            cards1.append(c1)
+            cards1.append(c2)
+        else:
+            cards2.append(c2)
+            cards2.append(c1)
+
+    return score(cards1, cards2)
 
 
 def run():
     data = load_data("Day22.txt")
     cards1, cards2 = get_cards(data)
-    print(play_cards(cards1, cards2))
+    print(play_combat(cards1, cards2))
+    cards1, cards2 = get_cards(data)
+    print(play_recursive_combat(cards1, cards2))
