@@ -35,11 +35,17 @@ class Puzzle:
                                 to_fill.append(neighbour)
                         break
                     tile.next_transformation()
+        print()
         # put the pixels together
         min_row = min([row for row, col in self.grid.keys()])
         min_col = min([col for row, col in self.grid.keys()])
         for r, c in product(range(self.assembly_size), range(self.assembly_size)):
             self.assembly[r, c] = self.grid[(r//8 + min_row, c//8 + min_col)].pixels[1 + (r % 8), 1 + (c % 8)]
+
+        return self.grid[(min_row, min_col)].number *\
+               self.grid[(min_row+11, min_col)].number *\
+               self.grid[(min_row, min_col+11)].number *\
+               self.grid[(min_row+11, min_col+11)].number
 
     def try_place(self, tile, row, col):
         if (row-1, col) in self.grid:
@@ -97,4 +103,4 @@ class Tile:
 def run():
     data = load_data("Day20.txt")
     puzzle = Puzzle(data)
-    puzzle.assemble()
+    print(puzzle.assemble())
