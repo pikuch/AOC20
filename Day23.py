@@ -68,11 +68,11 @@ class Cups:
         self.destination_to(number)
 
     def move(self):
-        self.show()
+        #self.show()
         self.pick_3()
-        self.show_picked()
+        #self.show_picked()
         self.go_to_destination()
-        self.show_destination()
+        #self.show_destination()
         self.place_picked()
         self.current = self.current.next
 
@@ -101,7 +101,7 @@ class Cups:
 
 
 def run():
-    data = load_data("Day23test0.txt")
+    data = load_data("Day23.txt")
     cups = Cups(data)
     for i in range(100):
         cups.move()
