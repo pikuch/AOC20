@@ -1,4 +1,5 @@
 # AOC20 day 24
+from PIL import Image, ImageDraw
 
 
 def load_data(f_name):
@@ -116,11 +117,27 @@ class Tiles:
         return count
 
 
+def render(tileset, step):
+    WIDTH, HEIGHT = 6000, 6000
+    img = Image.new("RGB", (WIDTH, HEIGHT), (255, 255, 255))
+    ctx = ImageDraw.Draw(img)
+    for x, y, z in tileset:
+        draw_tile(x, y, z, ctx, WIDTH/2, HEIGHT/2)
+    img.save(f".\\imgs\\step{step:03d}.png")
+
+
+def draw_tile(x, y, z, ctx, cx, cy):
+    xx = cx + 15 * x
+    yy = cy - 8 * y + 8 * z
+    ctx.polygon(((xx+13, yy-7), (xx+13, yy+7), (xx, yy+15), (xx-13, yy+7), (xx-13, yy-7), (xx, yy-15)), (0, 0, 0))
+
+
 def run():
     data = load_data("Day24.txt")
     tiles = Tiles(data)
     print(tiles.count())
     for t in range(100):
         print(f"\rstep {t}", end="")
+        # render(tiles.tiles, t)
         tiles.step()
     print(f"\r{tiles.count()}")
