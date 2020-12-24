@@ -1,5 +1,5 @@
 # AOC20 day 23
-from collections import deque
+import numpy as np
 
 
 def load_data(f_name):
@@ -16,8 +16,8 @@ class Cup:
 
 
 class Cups:
-    def __init__(self, data):
-        elements = list(map(int, data))
+    def __init__(self, elements):
+        self.length = len(elements)
         self.current = last = Cup(elements[0])
         for el in elements[1:]:
             last = self.insert_after(last, Cup(el))
@@ -51,7 +51,7 @@ class Cups:
         return self.picked[0].val == n or self.picked[1].val == n or self.picked[2].val == n
 
     def next_number(self, n):
-        return n - 1 if n > 1 else 9
+        return n - 1 if n > 1 else self.length
 
     def cursor_to(self, n):
         while self.current.val != n:
@@ -98,11 +98,50 @@ class Cups:
         while cursor != self.current:
             print(f"{cursor.val}", end="")
             cursor = cursor.next
+        print()
+
+
+class CupGame:
+    def __init__(self, cups):
+        self.cups = np.array(list(map(int, cups)), dtype=np.int)
+        self.current = 0
+        self.picked = []
+        self.destination = 0
+
+    def pick_3(self):
+        if self.current + 3 < self.cups.size:
+            self.picked = list(self.cups[self.current + 1:self.current + 4])
+        else:
+            self.picked = list(self.cups[self.current+1:])
+            self.picked += list(self.cups[:3-len(self.picked)])
+
+    def find_destination(self):
+        destination_value = self.cups[self.current]
+        while True:
+            destination_value = destination_value - 1 if destination_value > 1 else self.cups.size
+            if destination_value not in self.picked:
+                break
+        self.destination = np.where(self.cups == destination_value)
+
+    def place_picked(self):
+        pass
+
+    def move(self):
+        self.pick_3()
+        self.find_destination()
+        self.place_picked()
+        self.current = (self.current + 1) % self.cups.size
 
 
 def run():
     data = load_data("Day23.txt")
-    cups = Cups(data)
+    cups = Cups(list(map(int, data)))
     for i in range(100):
         cups.move()
-    cups.show_after_1()
+    cups.show_after_1()  # 38756249
+
+    cupgame = CupGame(data)
+    for i in range(100):
+        cupgame.move()
+
+    # cups = Cups(list(map(int, data)) + list(range(len(data)+1, 10**6 + 1)))
