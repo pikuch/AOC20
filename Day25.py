@@ -18,8 +18,8 @@ def calculate_loop_size(public_key):
 
 
 def calculate_encryption_key(public_key, loop_size):
-    subject_number = 7
-    value = public_key
+    subject_number = public_key
+    value = 1
     for _ in range(loop_size):
         value = (value * subject_number) % 20201227
     return value
@@ -30,5 +30,7 @@ def run():
     card_public_key, door_public_key = list(map(int, data.splitlines()))
     card_loop_size = calculate_loop_size(card_public_key)
     door_loop_size = calculate_loop_size(door_public_key)
-    print(calculate_encryption_key(card_public_key, door_loop_size))
-    print(calculate_encryption_key(door_public_key, card_loop_size))
+    door_private_key = calculate_encryption_key(card_public_key, door_loop_size)
+    card_private_key = calculate_encryption_key(door_public_key, card_loop_size)
+    print(f"Card public key: {card_public_key}, card loop size: {card_loop_size}, card private key: {card_private_key}")
+    print(f"Door public key: {door_public_key}, door loop size: {door_loop_size}, door private key: {door_private_key}")
