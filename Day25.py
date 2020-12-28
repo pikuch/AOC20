@@ -26,7 +26,7 @@ def calculate_encryption_key(public_key, loop_size):
 
 
 def run():
-    data = load_data("Day25test0.txt")
+    data = load_data("Day25.txt")
     card_public_key, door_public_key = list(map(int, data.splitlines()))
     card_loop_size = calculate_loop_size(card_public_key)
     door_loop_size = calculate_loop_size(door_public_key)

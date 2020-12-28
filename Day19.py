@@ -24,96 +24,35 @@ def parse_rule(s):
         return list(map(lambda option: list(map(int, option.split())), s.split(" | ")))
 
 
-# def consume_several(s, alternative, rules):
-#     for rule in alternative:
-#         result, s = consume(s, rule, rules)
-#         if not result:
-#             return False, s
-#     return True, s
-#
-#
-# def consume(s, rule, rules):
-#     if isinstance(rules[rule], str):
-#         if s.startswith(rules[rule]):
-#             return True, s[len(rules[rule]):]
-#         else:
-#             return False, s
-#     else:  # try consume substrings
-#         for alternative in rules[rule]:
-#             if alternative[0] == rule:  # a loop!
-#                 for i in range(10, 0, -1):  # consume greadily
-#                     result, reminder = consume_several(s, alternative[1:] * i, rules)
-#                     if result:
-#                         return True, reminder
-#             else:
-#                 result, reminder = consume_several(s, alternative, rules)
-#                 if result:
-#                     return True, reminder
-#         return False, s
-#
-#
-# def is_valid(s, rule, rules):
-#     result, reminder = consume(s, rule, rules):
-#     if result and not len(reminder):
-#         return True
-#     return False
-
-
-# def consume_several(s, alternative, rules):
-#     for rule in alternative:
-#         for result in consume(s, rule, rules):
-#             if result is None:
-#                 yield None
-#     yield result
-#
-#
-# def consume(s, rule, rules):
-#     if isinstance(rules[rule], str):
-#         if s.startswith(rules[rule]):
-#             yield s[len(rules[rule]):]
-#         else:
-#             yield None
-#     else:  # try consume substrings
-#         for alternative in rules[rule]:
-#             if alternative[0] == rule:  # a loop!
-#                 for i in range(10, 0, -1):  # consume greadily
-#                     for result in consume_several(s, alternative[1:] * i, rules):
-#                         if result is not None:
-#                             yield result
-#             else:
-#                 for result in consume_several(s, alternative, rules):
-#                     if result is not None:
-#                         yield result
-#         yield None
-#
-# def is_valid(s, rule, rules):
-#     return any([result == "" for result in consume(s, rule, rules)])
-
-
 def is_valid(s, rule, rules):
     to_check = deque()
-    to_check.append((s, rule, tuple()))
+    to_check.append((0, [rule]))  # index, rules to check against
     while len(to_check):
-        s, rule, leftovers = to_check.popleft()
-        if isinstance(rules[rule], str):
-            if s.startswith(rules[rule]):
-                if len(leftovers) > 0:
-                    to_check.append(s[len(rules[rule]):], )
-                yield
+        index, rule_list = to_check.popleft()
+        if index == len(s) and len(rule_list) == 0:
+            return True
+        if index == len(s) or len(rule_list) == 0:
+            continue
+        if isinstance(rules[rule_list[0]], str):
+            if s[index] == rules[rule_list[0]]:
+                to_check.append((index + 1, rule_list[1:]))
             else:
-                yield None
-        else:  # try consume substrings
-
+                continue
+        else:
+            for option in rules[rule_list[0]]:
+                to_check.append((index, option + rule_list[1:]))
+    return False
 
 
 def run():
-    data = load_data("Day19test0.txt")
+    data = load_data("Day19.txt")
     rules, strings = parse_data(data)
     print(sum(is_valid(s, 0, rules) for s in strings))
-    for s in strings:
-        print(s, is_valid(s, 0, rules))
-    exit(1)
     # new rules
-    rules[8] = [[42], [42, 8]]
-    rules[11] = [[42, 31], [42, 11, 31]]
+    magic_limit = 10
+    rules[8] = []
+    rules[11] = []
+    for i in range(1, magic_limit):
+        rules[8].append([42] * i)
+        rules[11].append([42] * i + [31] * i)
     print(sum(is_valid(s, 0, rules) for s in strings))
