@@ -1,4 +1,4 @@
-#AOC20
+# AOC20
 Advent of Code 2020
 
 used for Python learning
